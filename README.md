@@ -1,18 +1,33 @@
-# Zerodha MCP Server
+<div align="center">
 
-A Model Context Protocol (MCP) server that enables Claude AI to interact with Zerodha's Kite Connect API through natural language. Trade stocks, check positions, get market data, and manage orders by simply talking to Claude.
+# 🚀 Zerodha MCP Server
 
-## What is MCP?
+### Trade with Claude AI using Natural Language
 
-Model Context Protocol (MCP) is a standard that allows AI assistants like Claude to securely connect to external data sources and tools. This server exposes Zerodha trading capabilities to Claude, enabling natural language trading commands.
+*"Hey Claude, buy 10 shares of Infosys at market price"* - and it's done! ✨
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Bun](https://img.shields.io/badge/Bun-000000?style=for-the-badge&logo=bun&logoColor=white)](https://bun.sh)
+[![MCP](https://img.shields.io/badge/MCP-Enabled-green?style=for-the-badge)](https://modelcontextprotocol.io)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+
+</div>
+
+---
+
+## What is this?
+
+A Model Context Protocol (MCP) server that connects Claude AI to Zerodha's Kite Connect API. Trade stocks, check portfolios, and manage orders using natural language.
+
+> **MCP (Model Context Protocol)** allows AI assistants like Claude to securely connect to external tools and data sources.
 
 ## Features
 
 - 🤖 **Natural Language Trading**: Tell Claude what you want to trade in plain English
 - 📊 **Portfolio Management**: Check holdings, positions, and orders
 - 💹 **Market Data**: Get real-time quotes and last traded prices
-- 🔄 **Order Management**: Place, modify, and cancel orders
-- 🔒 **Secure**: Uses environment variables for credentials
+- 🔄 **Order Management**: Place and cancel orders
+- 🔒 **Secure**: Environment-based credentials
 
 ## Available Tools
 
@@ -76,6 +91,8 @@ Add to your Claude Desktop config file:
   }
 }
 ```
+
+Restart Claude Desktop after saving the config.
 
 ## Usage Examples
 
