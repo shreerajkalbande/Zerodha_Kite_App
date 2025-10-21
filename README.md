@@ -4,7 +4,7 @@
 
 ### Trade with Claude AI using Natural Language
 
-*"Hey Claude, buy 10 shares of Infosys at market price"* - and it's done! ✨
+*"Hey Claude, buy 10 shares of Infosys at market price"* - and it's done! 
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Bun](https://img.shields.io/badge/Bun-000000?style=for-the-badge&logo=bun&logoColor=white)](https://bun.sh)
