@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🚀 Zerodha MCP Server
+# Zerodha MCP Server
 
 ### Trade with Claude AI using Natural Language
 
