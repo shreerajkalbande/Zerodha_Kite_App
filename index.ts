@@ -14,7 +14,7 @@ const kc = new KiteConnect({ api_key: apiKey });
 console.log("Login URL:", kc.getLoginURL());
 
 async function generateSession() {
-  const response = await kc.generateSession(requestToken, apiSecret);
+  const response = await kc.generateSession(requestToken!, apiSecret!);
   kc.setAccessToken(response.access_token);
   console.log("Session generated successfully");
   return response.access_token;

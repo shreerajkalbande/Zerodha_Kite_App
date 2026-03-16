@@ -1,79 +1,92 @@
-<div align="center">
-
 # Zerodha MCP Server
 
-### Trade with Claude AI using Natural Language
+An MCP (Model Context Protocol) server that exposes Zerodha's Kite Connect trading API as structured tool calls. This allows any MCP-compatible AI client (e.g. Claude Desktop) to execute trades, query portfolio state, and fetch market data through a standardized interface.
 
-*"Hey Claude, buy 10 shares of Infosys at market price"* - and it's done! 
+## Architecture
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Bun](https://img.shields.io/badge/Bun-000000?style=for-the-badge&logo=bun&logoColor=white)](https://bun.sh)
-[![MCP](https://img.shields.io/badge/MCP-Enabled-green?style=for-the-badge)](https://modelcontextprotocol.io)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+```
+┌──────────────────┐       stdio        ┌──────────────────┐      HTTPS       ┌──────────────────┐
+│                  │  ─────────────────► │                  │ ───────────────► │                  │
+│   Claude Desktop │   MCP Protocol     │  MCP Server      │   Kite Connect   │  Zerodha APIs    │
+│   (MCP Client)   │  ◄───────────────  │  (this project)  │ ◄─────────────── │                  │
+│                  │   JSON responses    │                  │   REST responses │                  │
+└──────────────────┘                    └──────────────────┘                  └──────────────────┘
+```
 
-</div>
+The server runs as a child process of the MCP client, communicating over **stdio** using JSON-RPC. On startup it authenticates with Kite Connect using the provided request token, then registers 8 tools that the client can invoke.
 
----
+## Tools
 
-## What is this?
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `get_profile` | Account information (email, username, broker ID) | — |
+| `get_holdings` | Long-term equity holdings with P&L | — |
+| `get_positions` | Intraday and net positions | — |
+| `get_orders` | All orders placed during the trading session | — |
+| `place_order` | Place a BUY/SELL order | `exchange`, `tradingsymbol`, `transaction_type`, `quantity`, `order_type`, `product`, `price`\* |
+| `cancel_order` | Cancel a pending order | `order_id` |
+| `get_quote` | Full market quote (OHLC, volume, depth) | `instruments[]` |
+| `get_ltp` | Last traded price | `instruments[]` |
 
-A Model Context Protocol (MCP) server that connects Claude AI to Zerodha's Kite Connect API. Trade stocks, check portfolios, and manage orders using natural language.
+\* `price` is only required for LIMIT orders.
 
-> **MCP (Model Context Protocol)** allows AI assistants like Claude to securely connect to external tools and data sources.
+**Order parameters:**
+- **exchange** — `NSE`, `BSE`, `NFO`, `CDS`, `MCX`
+- **transaction_type** — `BUY`, `SELL`
+- **order_type** — `MARKET`, `LIMIT`
+- **product** — `CNC` (delivery), `MIS` (intraday), `NRML` (F&O/commodity)
 
-## Features
+## Tech Stack
 
-- 🤖 **Natural Language Trading**: Tell Claude what you want to trade in plain English
-- 📊 **Portfolio Management**: Check holdings, positions, and orders
-- 💹 **Market Data**: Get real-time quotes and last traded prices
-- 🔄 **Order Management**: Place and cancel orders
-- 🔒 **Secure**: Environment-based credentials
-
-## Available Tools
-
-- `get_profile` - Get user account information
-- `get_holdings` - View long-term equity holdings
-- `get_positions` - Check current day positions
-- `get_orders` - List all orders for the day
-- `place_order` - Place BUY/SELL orders
-- `cancel_order` - Cancel existing orders
-- `get_quote` - Get detailed market quotes
-- `get_ltp` - Get last traded price
+- **Runtime**: [Bun](https://bun.sh)
+- **Language**: TypeScript (strict mode, ESNext)
+- **MCP SDK**: `@modelcontextprotocol/sdk`
+- **Brokerage**: Zerodha Kite Connect (`kiteconnect` npm package)
+- **Transport**: stdio (JSON-RPC over stdin/stdout)
 
 ## Prerequisites
 
-- [Bun](https://bun.sh) runtime installed
-- Zerodha Kite Connect API credentials
-- Claude Desktop app (for MCP integration)
+1. [Bun](https://bun.sh) installed (`curl -fsSL https://bun.sh/install | bash`)
+2. A Zerodha account with [Kite Connect](https://kite.trade/) API access
+3. An MCP-compatible client (e.g. Claude Desktop)
 
 ## Setup
 
-1. Clone and install:
 ```bash
 git clone https://github.com/shreerajkalbande/Zerodha_Kite_App.git
 cd Zerodha_Kite_App
 bun install
 ```
 
-2. Configure credentials:
+Copy the example env file and fill in your credentials:
+
 ```bash
 cp .env.example .env
 ```
 
-3. Add your Zerodha API credentials to `.env`:
-```env
-KITE_API_KEY=your_api_key_here
-KITE_API_SECRET=your_api_secret_here
-KITE_REQUEST_TOKEN=your_request_token_here
+```
+KITE_API_KEY=<your_api_key>
+KITE_API_SECRET=<your_api_secret>
+KITE_REQUEST_TOKEN=<your_request_token>
 ```
 
-4. Get API credentials from [Zerodha Kite Connect](https://kite.trade/)
+Credentials are obtained from the [Kite Connect developer console](https://developers.kite.trade/). The request token is generated each time a user completes the login flow and has a short validity window.
 
-## Claude Desktop Configuration
+### Verifying credentials
 
-Add to your Claude Desktop config file:
+Run the standalone auth test to confirm your credentials work:
 
-**MacOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+```bash
+bun run index.ts
+```
+
+This generates a session and prints your account profile.
+
+## Claude Desktop Integration
+
+Add the following to your Claude Desktop config:
+
+**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 
 ```json
@@ -83,44 +96,58 @@ Add to your Claude Desktop config file:
       "command": "bun",
       "args": ["run", "/absolute/path/to/Zerodha_Kite_App/mcp-server.ts"],
       "env": {
-        "KITE_API_KEY": "your_api_key_here",
-        "KITE_API_SECRET": "your_api_secret_here",
-        "KITE_REQUEST_TOKEN": "your_request_token_here"
+        "KITE_API_KEY": "your_api_key",
+        "KITE_API_SECRET": "your_api_secret",
+        "KITE_REQUEST_TOKEN": "your_request_token"
       }
     }
   }
 }
 ```
 
-Restart Claude Desktop after saving the config.
+Restart Claude Desktop after updating the config. The server will appear as an available tool provider.
 
-## Usage Examples
+## Usage
 
-Once configured, you can ask Claude:
+Once connected, the MCP client can invoke any registered tool. Example natural language queries that map to tool calls:
 
-- "What's my current portfolio?"
-- "Buy 10 shares of INFY at market price"
-- "What's the current price of RELIANCE?"
-- "Show me all my open orders"
-- "Cancel order ID 12345"
-- "What are my positions for today?"
-
-## Running Standalone
-
-```bash
-bun run mcp-server.ts
+```
+"What's in my portfolio?"           → get_holdings
+"Show today's positions"            → get_positions
+"Buy 50 INFY at market on NSE"     → place_order (NSE, INFY, BUY, 50, MARKET, CNC)
+"What's RELIANCE trading at?"      → get_ltp (["NSE:RELIANCE"])
+"Cancel order 240315000012345"     → cancel_order
 ```
 
-## Security
+## Authentication Flow
 
-- Never commit `.env` file
-- Keep API credentials secure
-- Use request tokens with limited validity
-- Review all trades before execution
+1. User registers an app on [Kite Connect](https://developers.kite.trade/) and receives an **API key** and **API secret**
+2. User is redirected to Zerodha's login page → completes login → receives a **request token** via redirect
+3. On server startup, the request token is exchanged for an **access token** using `kc.generateSession()`
+4. The access token is used for all subsequent API calls during the session
+5. Request tokens are single-use and expire quickly — a new token is needed for each session
+
+## Project Structure
+
+```
+├── mcp-server.ts       # MCP server — tool registration and request handling
+├── index.ts            # Standalone script for credential verification
+├── package.json
+├── tsconfig.json
+├── .env.example
+└── .gitignore
+```
+
+## Security Notes
+
+- API credentials are passed via environment variables, never hardcoded
+- `.env` is gitignored — credentials are never committed
+- Request tokens have short validity and are single-use
+- The `place_order` tool executes real trades — the MCP client should always confirm with the user before invocation
 
 ## Disclaimer
 
-⚠️ **Trading involves financial risk. This tool is for educational purposes. Always verify trades before execution. The authors are not responsible for any financial losses.**
+This project interacts with live brokerage APIs and can place real trades. Use at your own risk. Always verify order parameters before execution. The author assumes no responsibility for financial losses.
 
 ## License
 

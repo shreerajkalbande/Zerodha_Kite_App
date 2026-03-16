@@ -1,35 +1,35 @@
-# dependencies (bun install)
-node_modules
+# dependencies
+node_modules/
 bun.lockb
 
-# output
-out
-dist
+# build output
+out/
+dist/
 *.tgz
 
-# code coverage
-coverage
+# coverage
+coverage/
 *.lcov
 
 # logs
-logs
-_.log
-report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
+logs/
+*.log
 
-# dotenv environment variable files
+# environment variables
 .env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
+.env.*.local
 
 # caches
 .eslintcache
-.cache
+.cache/
 *.tsbuildinfo
 
-# IntelliJ based IDEs
-.idea
+# editors
+.idea/
+.vscode/
+*.swp
+*.swo
 
-# Finder (MacOS) folder config
+# os
 .DS_Store
+Thumbs.db
