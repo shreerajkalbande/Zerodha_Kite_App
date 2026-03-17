@@ -5,12 +5,12 @@ An MCP (Model Context Protocol) server that exposes Zerodha's Kite Connect tradi
 ## Architecture
 
 ```
-┌──────────────────┐       stdio        ┌──────────────────┐      HTTPS       ┌────────────────┐
-│                  │  ─────────────────►│                  │ ───────────────► │                │
-│   Claude Desktop │   MCP Protocol     │  MCP Server      │   Kite Connect   │  Zerodha APIs  │
-│   (MCP Client)   │  ◄───────────────  │  (this project)  │ ◄─────────────── │                │
-│                  │   JSON responses   │                  │   REST responses │                │
-└──────────────────┘                    └──────────────────┘                  └────────────────┘
+┌──────────────────┐       stdio        ┌──────────────────┐      HTTPS       ┌───────────┐
+│                  │  ─────────────────►│                  │ ───────────────► │           │
+│   Claude Desktop │   MCP Protocol     │  MCP Server      │   Kite Connect   │  Zerodha  │
+│   (MCP Client)   │  ◄───────────────  │  (this project)  │ ◄─────────────── │    APIs   │
+│                  │   JSON responses   │                  │   REST responses │           │
+└──────────────────┘                    └──────────────────┘                  └───────────┘
 ```
 
 The server runs as a child process of the MCP client, communicating over **stdio** using JSON-RPC. On startup it authenticates with Kite Connect using the provided request token, then registers 8 tools that the client can invoke.
