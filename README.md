@@ -6,10 +6,10 @@ An MCP (Model Context Protocol) server that exposes Zerodha's Kite Connect tradi
 
 ```
 ┌──────────────────┐       stdio        ┌──────────────────┐      HTTPS       ┌──────────────────┐
-│                  │  ─────────────────► │                  │ ───────────────► │                  │
+│                  │  ─────────────────►│                  │ ───────────────► │                  │
 │   Claude Desktop │   MCP Protocol     │  MCP Server      │   Kite Connect   │  Zerodha APIs    │
 │   (MCP Client)   │  ◄───────────────  │  (this project)  │ ◄─────────────── │                  │
-│                  │   JSON responses    │                  │   REST responses │                  │
+│                  │   JSON responses   │                  │   REST responses │                  │
 └──────────────────┘                    └──────────────────┘                  └──────────────────┘
 ```
 
